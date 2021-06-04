@@ -5,27 +5,24 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.SoundEvent;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 public class SoundEventWrapper extends ElementWrapperBase<SoundEvent> {
 
-    public SoundEventWrapper(SoundEvent target) {
+    public SoundEventWrapper(@Nonnull SoundEvent target) {
         super(target);
     }
 
+    @Export
+    @Nullable
     public ResourceLocationWrapper registryName() {
-        return new ResourceLocationWrapper(getValue().getRegistryName());
+        return optional(ResourceLocationWrapper::new, getValue().getRegistryName());
     }
 
+    @Export
+    @Nullable
     public ResourceLocationWrapper location() {
-        return new ResourceLocationWrapper(getValue().getLocation());
-    }
-
-    @Override
-    public JsonElement getJsonValue() {
-        JsonObject result = new JsonObject();
-
-        result.add("registryName", registryName().getJsonValue());
-        result.add("location", location().getJsonValue());
-
-        return result;
+        return optional(ResourceLocationWrapper::new, getValue().getLocation());
     }
 }

@@ -3,29 +3,27 @@ package com.github.linggify.minecraft.craftminer.javascript.wrappers.element.blo
 import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.*;
 import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.primitive.NumberWrapper;
 import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.primitive.StringWrapper;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.util.ColorWrapper;
 import net.minecraft.block.material.MaterialColor;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Map;
 
 public class BlockMaterialColorWrapper extends ElementWrapperBase<MaterialColor> {
 
-    public BlockMaterialColorWrapper(MaterialColor target) {
+    public BlockMaterialColorWrapper(@Nonnull MaterialColor target) {
         super(target);
     }
 
-    public NumberWrapper color() {
-        return new NumberWrapper(getValue().col);
-    }
-
+    @Export
+    @Nonnull
     public NumberWrapper id() {
         return new NumberWrapper(getValue().id);
     }
 
+    @Export
+    @Nonnull
     public IElementWrapper<?> name() {
         try {
             //use the name of the fields as name
@@ -45,33 +43,9 @@ public class BlockMaterialColorWrapper extends ElementWrapperBase<MaterialColor>
         }
     }
 
-    public StringWrapper hexColor() {
-        return new StringWrapper("#" + Integer.toHexString(getValue().col));
-    }
-
-    public MapWrapper rgbColor() {
-        int red = getValue().col >> 16 & 0xff;
-        int green = getValue().col >> 8 & 0xff;
-        int blue = getValue().col & 0xff;
-
-        Map<String, NumberWrapper> color = new HashMap<>();
-        color.put("red", new NumberWrapper(red));
-        color.put("green", new NumberWrapper(green));
-        color.put("blue", new NumberWrapper(blue));
-
-        return new MapWrapper(color);
-    }
-
-    @Override
-    public JsonElement getJsonValue() {
-        JsonObject result = new JsonObject();
-
-        result.add("name", name().getJsonValue());
-        result.add("id", id().getJsonValue());
-        result.add("color", color().getJsonValue());
-        result.add("hexColor", hexColor().getJsonValue());
-        result.add("rgbColor", rgbColor().getJsonValue());
-
-        return result;
+    @Export
+    @Nonnull
+    public ColorWrapper color() {
+        return new ColorWrapper(getValue().col);
     }
 }

@@ -6,17 +6,16 @@ import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.prim
 import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.ElementWrapperBase;
 import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.primitive.EnumWrapper;
 import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.primitive.StringWrapper;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
 import net.minecraft.block.material.PushReaction;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 public class BlockMaterialWrapper extends ElementWrapperBase<Material> {
-    public BlockMaterialWrapper(Material target) {
+    public BlockMaterialWrapper(@Nonnull Material target) {
         super(target);
     }
 
@@ -32,6 +31,8 @@ public class BlockMaterialWrapper extends ElementWrapperBase<Material> {
                 && (x.getPushReaction() == y.getPushReaction());
     }
 
+    @Export
+    @Nonnull
     public IElementWrapper<?> name() {
         try {
             //use the name of the fields as name
@@ -51,52 +52,51 @@ public class BlockMaterialWrapper extends ElementWrapperBase<Material> {
         }
     }
 
+    @Export
+    @Nonnull
     public BooleanWrapper blocksMotion() {
         return new BooleanWrapper(getValue().blocksMotion());
     }
 
+    @Export
+    @Nonnull
     public BooleanWrapper isReplaceable() {
         return new BooleanWrapper(getValue().isReplaceable());
     }
 
+    @Export
+    @Nonnull
     public BooleanWrapper isLiquid() {
         return new BooleanWrapper(getValue().isLiquid());
     }
 
+    @Export
+    @Nonnull
     public BooleanWrapper isFlammable() {
         return new BooleanWrapper(getValue().isFlammable());
     }
 
+    @Export
+    @Nonnull
     public BooleanWrapper isSolid() {
         return new BooleanWrapper(getValue().isSolid());
     }
 
+    @Export
+    @Nonnull
     public BooleanWrapper isSolidBlocking() {
         return new BooleanWrapper(getValue().isSolidBlocking());
     }
 
+    @Export
+    @Nullable
     public BlockMaterialColorWrapper color() {
-        return new BlockMaterialColorWrapper(getValue().getColor());
+        return optional(BlockMaterialColorWrapper::new, getValue().getColor());
     }
 
+    @Export
+    @Nullable
     public EnumWrapper<PushReaction> pushReaction() {
-        return new EnumWrapper<>(getValue().getPushReaction());
-    }
-
-    @Override
-    public JsonElement getJsonValue() {
-        JsonObject result = new JsonObject();
-
-        result.add("name", name().getJsonValue());
-        result.add("blocksMotion", blocksMotion().getJsonValue());
-        result.add("isReplaceable", isReplaceable().getJsonValue());
-        result.add("isLiquid", isLiquid().getJsonValue());
-        result.add("isFlammable", isFlammable().getJsonValue());
-        result.add("isSolid", isSolid().getJsonValue());
-        result.add("isSolidBlocking", isSolidBlocking().getJsonValue());
-        result.add("color", color().getJsonValue());
-        result.add("pushReaction", pushReaction().getJsonValue());
-
-        return result;
+        return optional(getValue().getPushReaction());
     }
 }

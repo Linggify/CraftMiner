@@ -6,21 +6,26 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.util.ResourceLocation;
 
+import javax.annotation.Nonnull;
+
 public class ResourceLocationWrapper extends ElementWrapperBase<ResourceLocation> {
-    public ResourceLocationWrapper(ResourceLocation target) {
+    public ResourceLocationWrapper(@Nonnull ResourceLocation target) {
         super(target);
     }
 
+    @Nonnull
     public StringWrapper path() {
         return new StringWrapper(getValue().getPath());
     }
 
+    @Nonnull
     public StringWrapper namespace() {
         return new StringWrapper(getValue().getNamespace());
     }
 
+    @Nonnull
     public StringWrapper full() {
-        return new StringWrapper(getValue().getNamespace());
+        return new StringWrapper(getValue().toString());
     }
 
     @Override

@@ -5,18 +5,20 @@ import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.bloc
 import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.item.ItemWrapper;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class ElementSetWrappers {
 
     /**
      * Wrapper for a set of blocks
      */
-    private static class BlockSetWrapper extends ElementSetWrapperBase<BlockWrapper>{
+    public static class BlockSetWrapper extends ElementSetWrapperBase<BlockWrapper>{
         public BlockSetWrapper(Set<BlockWrapper> values) {
             super(BlockSetWrapper::new, values);
         }
@@ -27,6 +29,13 @@ public class ElementSetWrappers {
 
         public IElementSetWrapper<BlockWrapper> inNamespace(String namespace) {
             return filter(block -> block.registryName().namespace().get().equals(namespace));
+        }
+
+        public IElementSetWrapper<ItemWrapper> getItems() {
+            IElementSetWrapper<ItemWrapper> wrapper =  new ItemSetWrapper(getValues().stream().map(BlockWrapper::getItem).collect(Collectors.toSet()));
+            wrapper.setDumpOutput(m_dumpRoot);
+
+            return wrapper;
         }
     }
 
@@ -40,10 +49,21 @@ public class ElementSetWrappers {
         return new BlockSetWrapper(wrapped);
     }
 
-    private static class ItemSetWrapper extends ElementSetWrapperBase<ItemWrapper> {
+    /**
+     * Wrapper for items
+     */
+    public static class ItemSetWrapper extends ElementSetWrapperBase<ItemWrapper> {
 
         public ItemSetWrapper(Set<ItemWrapper> values) {
             super(ItemSetWrapper::new, values);
+        }
+
+        public IElementSetWrapper<ItemWrapper> taggedWith(String namespace, String path) {
+            return filter(item -> item.isTagged(new ResourceLocation(namespace, path)));
+        }
+
+        public IElementSetWrapper<ItemWrapper> inNamespace(String namespace) {
+            return filter(item -> item.registryName().namespace().get().equals(namespace));
         }
     }
 

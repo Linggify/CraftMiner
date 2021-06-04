@@ -17,7 +17,7 @@ public class ElementSetWrapperBase<T extends IElementWrapper<?>> implements IEle
     private final Function<Set<T>, ? extends IElementSetWrapper<T>> m_factory;
     private final Set<T> m_values;
 
-    private JsonObject m_dumpRoot;
+    protected JsonObject m_dumpRoot;
 
     public ElementSetWrapperBase(Function<Set<T>, ? extends IElementSetWrapper<T>> factory, Set<T> values) {
         m_factory = factory;

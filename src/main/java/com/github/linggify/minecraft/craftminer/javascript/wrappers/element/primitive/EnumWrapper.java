@@ -4,8 +4,10 @@ import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.Elem
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
+import javax.annotation.Nonnull;
+
 public class EnumWrapper<T extends Enum<?>> extends ElementWrapperBase<T> {
-    public EnumWrapper(T target) {
+    public EnumWrapper(@Nonnull T target) {
         super(target);
     }
 

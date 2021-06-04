@@ -6,17 +6,17 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import net.minecraftforge.common.ToolType;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 public class ToolTypeWrapper extends ElementWrapperBase<ToolType> {
-    public ToolTypeWrapper(ToolType target) {
+    public ToolTypeWrapper(@Nonnull ToolType target) {
         super(target);
     }
 
+    @Export
+    @Nullable
     public StringWrapper name() {
-        return new StringWrapper(getValue().getName());
-    }
-
-    @Override
-    public JsonElement getJsonValue() {
-        return new JsonPrimitive(getValue().getName());
+        return optional(getValue().getName());
     }
 }

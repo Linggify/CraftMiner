@@ -19,11 +19,9 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.system.CallbackI;
 
 import javax.script.ScriptException;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Used to wrap the setup of commands
@@ -40,7 +38,7 @@ public class CraftMinerCommandsSetup {
             try {
                 JsonObject result = JavaScriptExecutor.execute(context.getArgument("script", File.class));
 
-                Writer writer = new FileWriter(new File(CraftMiner.DUMPS_ROOT, "dump.json"));
+                Writer writer = new OutputStreamWriter(new FileOutputStream(new File(CraftMiner.DUMPS_ROOT, "dump.json")), StandardCharsets.UTF_8);
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 gson.toJson(result, writer);
                 writer.flush();

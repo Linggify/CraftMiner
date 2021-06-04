@@ -4,9 +4,11 @@ import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.Elem
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
+import javax.annotation.Nonnull;
+
 public class StringWrapper extends ElementWrapperBase<String> {
 
-    public StringWrapper(String target) {
+    public StringWrapper(@Nonnull String target) {
         super(target);
     }
 

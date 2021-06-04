@@ -4,8 +4,10 @@ import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.Elem
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
+import javax.annotation.Nonnull;
+
 public class NumberWrapper extends ElementWrapperBase<Number> {
-    public NumberWrapper(Number target) {
+    public NumberWrapper(@Nonnull Number target) {
         super(target);
     }
 
