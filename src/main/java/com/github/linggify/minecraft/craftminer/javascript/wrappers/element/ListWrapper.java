@@ -6,15 +6,20 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
 import java.util.List;
+import java.util.Objects;
 
-public class ListWrapper extends ElementWrapperBase<List<? extends IElementWrapper<?>>> {
+public class ListWrapper<T extends IElementWrapper<?>> extends ElementWrapperBase<List<T>> {
 
-    public ListWrapper(List<? extends IElementWrapper<?>> target) {
+    public ListWrapper(List<T> target) {
         super(target);
     }
 
     public IElementWrapper<?> get(int index) {
         return getValue().get(index);
+    }
+
+    public boolean contains(T element) {
+        return getValue().contains(element);
     }
 
     @Override

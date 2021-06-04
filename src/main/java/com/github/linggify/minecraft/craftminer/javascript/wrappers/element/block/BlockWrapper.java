@@ -1,18 +1,28 @@
 package com.github.linggify.minecraft.craftminer.javascript.wrappers.element.block;
 
+import com.github.linggify.minecraft.craftminer.javascript.moc.MocWorldReader;
 import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.ElementWrapperBase;
+import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.ExceptionWrapper;
 import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.IElementWrapper;
-import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.NumberWrapper;
-import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.StringWrapper;
+import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.ListWrapper;
+import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.primitive.BooleanWrapper;
+import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.primitive.NumberWrapper;
+import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.primitive.StringWrapper;
+import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.util.ResourceLocationWrapper;
+import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.util.ToolTypeWrapper;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-import net.minecraft.block.AbstractBlock;
+import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.Explosion;
+import net.minecraftforge.common.ToolType;
 
 import java.lang.reflect.Field;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class BlockWrapper extends ElementWrapperBase<Block> {
 
@@ -25,19 +35,12 @@ public class BlockWrapper extends ElementWrapperBase<Block> {
      * @param tag
      * @return
      */
-    public boolean isTagged(String tag) {
-        return Objects.requireNonNull(BlockTags.getAllTags().getTag(new ResourceLocation(tag.split(":")[0], tag.split(":")[1]))).contains(getValue());
+    public boolean isTagged(ResourceLocation tag) {
+        return Objects.requireNonNull(BlockTags.getAllTags().getTag(tag)).contains(getValue());
     }
 
-    public BlockPropertiesWrapper properties() throws NoSuchFieldException, IllegalAccessException {
-        Field properties = AbstractBlock.class.getDeclaredField("properties");
-        boolean isAccessible = properties.isAccessible();
-        properties.setAccessible(true);
-
-        AbstractBlock.Properties value = (AbstractBlock.Properties) properties.get(getValue());
-        properties.setAccessible(isAccessible);
-
-        return new BlockPropertiesWrapper(value);
+    public ResourceLocationWrapper registryName() {
+        return new ResourceLocationWrapper(getValue().getRegistryName());
     }
 
     public IElementWrapper<?> harvestLevel() {
@@ -45,15 +48,55 @@ public class BlockWrapper extends ElementWrapperBase<Block> {
     }
 
     public IElementWrapper<?> harvestTool() {
-        return new StringWrapper(getValue().defaultBlockState().getHarvestTool().getName());
+        ToolType tool = getValue().defaultBlockState().getHarvestTool();
+
+        return new StringWrapper(tool != null ? tool.getName() : "null");
+    }
+
+    public IElementWrapper<?> isRandomlyTicking() {
+        return new BooleanWrapper(getValue().defaultBlockState().isRandomlyTicking());
+    }
+
+    public IElementWrapper<?> canOcclude() {
+        return new BooleanWrapper(getValue().defaultBlockState().canOcclude());
+    }
+
+    public IElementWrapper<?> requiresCorrectToolForDrops() {
+        return new BooleanWrapper(getValue().defaultBlockState().requiresCorrectToolForDrops());
+    }
+
+    public IElementWrapper<?> lootTable() {
+        return new ResourceLocationWrapper(getValue().getLootTable());
+    }
+
+    public IElementWrapper<?> hasDynamicShape() {
+        return new BooleanWrapper(getValue().hasDynamicShape());
+    }
+
+    public IElementWrapper<?> hasLargeShape() {
+        return new BooleanWrapper(getValue().defaultBlockState().hasLargeCollisionShape());
+    }
+
+    public IElementWrapper<?> isAir() {
+        return new BooleanWrapper(getValue().defaultBlockState().isAir());
     }
 
     public IElementWrapper<?> destroySpeed() {
-        return new NumberWrapper(getValue().defaultBlockState().getDestroySpeed(null, null));
+        MocWorldReader world = new MocWorldReader();
+        BlockPos pos = new BlockPos(0, 0, 0);
+        world.putBlockState(pos, getValue().defaultBlockState());
+
+        return new NumberWrapper(getValue().defaultBlockState().getDestroySpeed(world, pos));
     }
 
     public IElementWrapper<?> explosionResistance() {
-        return new NumberWrapper(getValue().defaultBlockState().getExplosionResistance(null, null, null));
+        MocWorldReader world = new MocWorldReader();
+        BlockPos pos = new BlockPos(0, 0, 0);
+        world.putBlockState(pos, getValue().defaultBlockState());
+
+        Explosion explosion = Minecraft.getInstance().level.explode(null, 0, 0, 0, 1, Explosion.Mode.NONE);
+
+        return new NumberWrapper(getValue().defaultBlockState().getExplosionResistance(world, pos, explosion));
     }
 
     public IElementWrapper<?> friction() {
@@ -72,8 +115,57 @@ public class BlockWrapper extends ElementWrapperBase<Block> {
         return new BlockMaterialWrapper(getValue().defaultBlockState().getMaterial());
     }
 
+    public IElementWrapper<?> soundType() {
+        return new BlockSoundTypeWrapper(getValue().defaultBlockState().getSoundType());
+    }
+
+    @SuppressWarnings("unchecked")
+    public IElementWrapper<?> effectiveTools() {
+        Map<String, ToolType> toolTypes = null;
+
+        try {
+            Field typesField = ToolType.class.getDeclaredField("VALUES");
+            boolean accessible = typesField.isAccessible();
+            typesField.setAccessible(true);
+            toolTypes = (Map<String, ToolType>) typesField.get(null);
+            typesField.setAccessible(accessible);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            return new ExceptionWrapper(e);
+        }
+
+        List<ToolType> effectiveTools = new ArrayList<>();
+        for (ToolType tool : toolTypes.values()) {
+            if (getValue().defaultBlockState().isToolEffective(tool)) {
+                effectiveTools.add(tool);
+            }
+        }
+
+        return new ListWrapper<>(effectiveTools.stream().map(ToolTypeWrapper::new).collect(Collectors.toList()));
+    }
+
     @Override
     public JsonElement getJsonValue() {
-        return new JsonPrimitive(getValue().getRegistryName().toString());
+        JsonObject result = new JsonObject();
+
+        result.add("registryName", registryName().getJsonValue());
+        result.add("harvestLevel", harvestLevel().getJsonValue());
+        result.add("harvestTool", harvestTool().getJsonValue());
+        result.add("isRandomlyTicking", isRandomlyTicking().getJsonValue());
+        result.add("canOcclude", canOcclude().getJsonValue());
+        result.add("requiresCorrectToolForDrops", requiresCorrectToolForDrops().getJsonValue());
+        result.add("lootTable", lootTable().getJsonValue());
+        result.add("hasDynamicShape", hasDynamicShape().getJsonValue());
+        result.add("hasLargeShape", hasLargeShape().getJsonValue());
+        result.add("isAir", isAir().getJsonValue());
+        result.add("destroySpeed", destroySpeed().getJsonValue());
+        result.add("explosionResistance", explosionResistance().getJsonValue());
+        result.add("friction", friction().getJsonValue());
+        result.add("speedFactor", speedFactor().getJsonValue());
+        result.add("jumpFactor", jumpFactor().getJsonValue());
+        result.add("material", material().getJsonValue());
+        result.add("soundType", soundType().getJsonValue());
+        result.add("effectiveTools", effectiveTools().getJsonValue());
+
+        return result;
     }
 }

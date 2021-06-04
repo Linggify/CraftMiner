@@ -1,6 +1,8 @@
 package com.github.linggify.minecraft.craftminer.javascript.wrappers.element.block;
 
 import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.*;
+import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.primitive.NumberWrapper;
+import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.primitive.StringWrapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.block.material.MaterialColor;
