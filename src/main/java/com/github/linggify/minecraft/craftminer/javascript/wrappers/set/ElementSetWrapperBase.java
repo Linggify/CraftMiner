@@ -141,4 +141,29 @@ public class ElementSetWrapperBase<T extends IElementWrapper<?>> implements IEle
 
         return resultWrapper;
     }
+
+    @Override
+    public boolean isEmpty() {
+        return m_values.isEmpty();
+    }
+
+    @Override
+    public boolean any(UnsafePredicate<T> condition) {
+        boolean result = false;
+        for (T value : m_values) {
+            result |= condition.test(value);
+        }
+
+        return result;
+    }
+
+    @Override
+    public boolean all(UnsafePredicate<T> condition) {
+        boolean result = true;
+        for (T value : m_values) {
+            result &= condition.test(value);
+        }
+
+        return result;
+    }
 }

@@ -1,6 +1,5 @@
 package com.github.linggify.minecraft.craftminer.javascript.wrappers.set;
 
-import com.github.linggify.minecraft.craftminer.javascript.TagUtil;
 import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.block.BlockWrapper;
 import com.github.linggify.minecraft.craftminer.javascript.wrappers.element.item.ItemWrapper;
 import net.minecraft.block.Block;
@@ -10,7 +9,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ElementSetWrappers {
@@ -24,11 +22,15 @@ public class ElementSetWrappers {
         }
 
         public IElementSetWrapper<BlockWrapper> taggedWith(String namespace, String path) {
-            return filter(new TagUtil().checkFor(namespace, path));
+            return filter(block -> block.isTagged(new ResourceLocation(namespace, path)));
         }
 
         public IElementSetWrapper<BlockWrapper> inNamespace(String namespace) {
             return filter(block -> block.registryName().namespace().get().equals(namespace));
+        }
+
+        public IElementSetWrapper<BlockWrapper> withProperty(String property) {
+            return filter(block -> block.hasProperty(property));
         }
 
         public IElementSetWrapper<ItemWrapper> getItems() {

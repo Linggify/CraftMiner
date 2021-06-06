@@ -62,4 +62,24 @@ public interface IElementSetWrapper<T extends IElementWrapper<?>> {
      * @return a new {@link IElementSetWrapper} containing only elements which are either in this wrapper or in the given one
      */
     IElementSetWrapper<T> inverseIntersect(IElementSetWrapper<T> other);
+
+    /**
+     *
+     * @return true if this {@link IElementSetWrapper} contains no element
+     */
+    boolean isEmpty();
+
+    /**
+     *
+     * @param condition
+     * @return true if any element satisfies the condition (if the wrapper is empty should return false)
+     */
+    boolean any(UnsafePredicate<T> condition);
+
+    /**
+     *
+     * @param condition
+     * @return true if all elements satisfy the condition (if the wrapper is empty should return true)
+     */
+    boolean all(UnsafePredicate<T> condition);
 }

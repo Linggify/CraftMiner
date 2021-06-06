@@ -2,6 +2,8 @@ package com.github.linggify.minecraft.craftminer.javascript;
 
 import com.google.gson.JsonObject;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.ICommandSource;
 
 import javax.script.*;
 import java.io.BufferedReader;
@@ -14,7 +16,7 @@ import java.io.FileReader;
  */
 public class JavaScriptExecutor {
 
-    public static JsonObject execute(File file) throws FileNotFoundException, ScriptException, NoSuchMethodException {
+    public static JsonObject execute(File file, CommandSource caller) throws FileNotFoundException, ScriptException, NoSuchMethodException {
         //retrieve scriptengine
         //ScriptEngineManager manager = new ScriptEngineManager();
         //ScriptEngine jsEngine = manager.getEngineByName("JavaScript");
@@ -22,9 +24,8 @@ public class JavaScriptExecutor {
         ScriptEngine jsEngine = factory.getScriptEngine("--language=es6");
 
         //add context as global variable
-        CraftMinerExecutionContext context = new CraftMinerExecutionContext();
+        CraftMinerExecutionContext context = new CraftMinerExecutionContext(caller);
         jsEngine.put("context", context);
-        jsEngine.put("tags", new TagUtil());
 
         //execute the script
         jsEngine.eval(new BufferedReader(new FileReader(file)));

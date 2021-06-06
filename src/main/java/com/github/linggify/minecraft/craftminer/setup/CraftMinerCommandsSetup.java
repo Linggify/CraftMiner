@@ -36,7 +36,7 @@ public class CraftMinerCommandsSetup {
         // register commands
         CraftMinerCommands.registerCommand(context -> {
             try {
-                JsonObject result = JavaScriptExecutor.execute(context.getArgument("script", File.class));
+                JsonObject result = JavaScriptExecutor.execute(context.getArgument("script", File.class), context.getSource());
 
                 Writer writer = new OutputStreamWriter(new FileOutputStream(new File(CraftMiner.DUMPS_ROOT, "dump.json")), StandardCharsets.UTF_8);
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();

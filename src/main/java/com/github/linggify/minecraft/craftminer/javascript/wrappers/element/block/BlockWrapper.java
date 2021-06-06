@@ -46,6 +46,15 @@ public class BlockWrapper extends ElementWrapperBase<Block> {
         return realTag.contains(getValue());
     }
 
+    /**
+     * Checks whether there is a property with exactly the given name in the default block state of the wrapped block
+     * @param name
+     * @return
+     */
+    public boolean hasProperty(String name) {
+        return getValue().defaultBlockState().getProperties().stream().anyMatch(property -> property.getName().equals(name));
+    }
+
     public ItemWrapper getItem() {
         return new ItemWrapper(getValue().asItem());
     }
@@ -192,5 +201,11 @@ public class BlockWrapper extends ElementWrapperBase<Block> {
     @Nonnull
     public IElementWrapper<?> tags() {
         return new ListWrapper<>(getValue().getTags().stream().map(ResourceLocationWrapper::new).collect(Collectors.toList()));
+    }
+
+    @Export
+    @Nonnull
+    public IElementWrapper<?> blockstateProperties() {
+        return new ListWrapper<>(getValue().defaultBlockState().getProperties().stream().map(BlockStatePropertyWrapper::new).collect(Collectors.toList()));
     }
 }
