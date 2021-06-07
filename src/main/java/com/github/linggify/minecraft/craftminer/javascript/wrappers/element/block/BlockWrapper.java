@@ -208,4 +208,10 @@ public class BlockWrapper extends ElementWrapperBase<Block> {
     public IElementWrapper<?> blockstateProperties() {
         return new ListWrapper<>(getValue().defaultBlockState().getProperties().stream().map(BlockStatePropertyWrapper::new).collect(Collectors.toList()));
     }
+
+    @Export
+    @Nonnull
+    public IElementWrapper<?> textures() {
+        return new BlockModelSummaryWrapper(getValue().defaultBlockState());
+    }
 }
